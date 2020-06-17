@@ -19,13 +19,14 @@ from eventIsotropy.emdVar import _cdist_cos, emd_Calc
 
 from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
-rc('text', usetex=True)
+
+rc("text", usetex=True)
 from prettytable import PrettyTable
 
 ############################################
 ## Specify input file
-if len(sys.argv)<3:
-    print 'Error: user did not specify input file and sphere index'
+if len(sys.argv) < 3:
+    print "Error: user did not specify input file and sphere index"
     sys.exit(2)
 
 ## Generate spherical sample
@@ -34,37 +35,41 @@ sphereEng = np.array([engFromVec(sphereSample[j]) for j in range(5)])
 
 ## Choose sphere n points
 sphInd = int(sys.argv[2])
-if sphInd>5:
-    print 'Warning! You are generating a sphere with'+str(12*(4**sphInd))+' particles. This is an extremely long calculation time'
+if sphInd > 5:
+    print "Warning! You are generating a sphere with" + str(
+        12 * (4 ** sphInd)
+    ) + " particles. This is an extremely long calculation time"
 
 spherePoints1 = sphereSample[sphInd]
 sphereEng1 = sphereEng[sphInd]
 
-fileName=sys.argv[1]
+fileName = sys.argv[1]
 
-momenta=[]
-engL=[]
-file = open(fileName, 'r')
+momenta = []
+engL = []
+file = open(fileName, "r")
 
 if file.closed:
-    print('Error: could not open file')
+    print ("Error: could not open file")
     sys.exit(2)
 
-nextline=file.readline()
-while nextline[0:7]=="<event>":
-    nextline=file.readline()
-    while nextline[0:8]!="</event>":
+nextline = file.readline()
+while nextline[0:7] == "<event>":
+    nextline = file.readline()
+    while nextline[0:8] != "</event>":
         particle = [float(n) for n in nextline.split()]
-            eng, px, py, pz = particle[0], particle[1], particle[2], particle[3]
-            if eng > 1e-05:
-                momenta.append(np.array([px, py, pz]))
-                engL.append(eng)
+        eng, px, py, pz = particle[0], particle[1], particle[2], particle[3]
+        if eng > 1e-05:
+            momenta.append(np.array([px, py, pz]))
+            engL.append(eng)
         nextline = file.readline()
-    nextline=file.readline()
+    nextline = file.readline()
 
 file.close()
 
 ## Calculate the \semd values
-M = _cdist_cos(spherePoints1,np.array(momenta)) # Calculates distance with 1 - \cos metric
-emdval = emd_Calc(sphereEng1, np.array(engL), M) # Computes EMD
-print(emdval)
+M = _cdist_cos(
+    spherePoints1, np.array(momenta)
+)  # Calculates distance with 1 - \cos metric
+emdval = emd_Calc(sphereEng1, np.array(engL), M)  # Computes EMD
+print (emdval)
